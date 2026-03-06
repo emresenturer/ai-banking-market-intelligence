@@ -1,7 +1,6 @@
 # AI Banking Market Intelligence
 
 ## Overview
-
 This project demonstrates how AI can automate market intelligence
 for the banking industry by collecting, analyzing, and summarizing
 industry developments.
@@ -13,9 +12,8 @@ The system transforms raw news and reports into executive-level insights.
 ## Problem
 
 Market intelligence teams spend significant time manually tracking
-industry developments and summarizing trends.
-
-This process is slow and difficult to scale.
+industry developments and summarizing trends. This process is slow
+and difficult to scale.
 
 ---
 
@@ -43,10 +41,10 @@ This AI workflow automatically:
 
 ## Tools Used
 
-Claude  
-ChatGPT  
-Notion  
-Python  
+Claude
+ChatGPT
+Notion
+Python
 
 ---
 
