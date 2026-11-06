@@ -22,7 +22,7 @@ with fintech startups and improve operational efficiency.
 
 Institutions that successfully integrate AI into their
 customer and operational workflows will likely gain
-competitive advantage in the next 3–5 years.
+competitive advantage in the next 3 to 5 years.
 
 ---
 
@@ -30,4 +30,4 @@ competitive advantage in the next 3–5 years.
 
 • Expansion of AI-driven financial products
 • Regulatory responses to fintech growth
-• Bank–tech partnerships
+• Bank and tech partnerships
