@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Banking Market Intelligence Briefing</title>
+<meta name="description" content="Paste banking news, links text or notes and get an executive market intelligence briefing tailored to your CEO, strategy, product or risk audience. Bring your own Anthropic key.">
+<meta property="og:title" content="Banking Market Intelligence Briefing">
+<meta property="og:description" content="Turn pasted banking news into an executive briefing: top developments, regulatory, fintech, trends, implications, actions and a watchlist.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://emresenturer.github.io/ai-banking-market-intelligence/">
+<meta name="theme-color" content="#0f3d3e">
+<style>
+:root{
+  --bg:#f5f7f6; --card:#ffffff; --ink:#14201f; --soft:#5a6b69; --line:#dbe3e1; --accent:#0f6b5c; --accent-ink:#fff;
+  --warn-bg:#fff7e0; --warn-ink:#6b4e00; --err-bg:#fdecec; --err-ink:#8a1c1c; --hi:#b42318; --med:#b54708; --lo:#2e7d32; --chip:#eef3f2;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#0e1514; --card:#162120; --ink:#e7efed; --soft:#9fb2af; --line:#2a3a38; --accent:#4fc3a8; --accent-ink:#0e1514;
+    --warn-bg:#3a2f0b; --warn-ink:#f5d77a; --err-bg:#3b1515; --err-ink:#f3a3a3; --hi:#ff8a80; --med:#ffb74d; --lo:#81c784; --chip:#1f2e2c; }
+}
+*{box-sizing:border-box}
+html,body{margin:0;overflow-x:hidden}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5;font-size:16px}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1280px;margin:0 auto;padding:16px}
+header h1{font-size:clamp(24px,4vw,34px);margin:8px 0 4px;line-height:1.15}
+header p.lead{margin:0;color:var(--soft);font-size:17px}
+.notice{margin:12px 0 0;padding:10px 14px;border-radius:10px;background:var(--warn-bg);color:var(--warn-ink);font-size:14px}
+.layout{display:grid;grid-template-columns:1fr;gap:16px;margin-top:16px}
+@media (min-width:1000px){.layout{grid-template-columns:minmax(380px,460px) minmax(0,1fr);align-items:start}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;min-width:0}
+label{display:block;font-weight:600;margin:12px 0 6px}
+label:first-child{margin-top:0}
+.hint{font-weight:400;color:var(--soft);font-size:13px}
+textarea,input[type=text],input[type=password],select{width:100%;font:inherit;color:inherit;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+textarea{min-height:260px;resize:vertical;font-size:14px;line-height:1.45}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+.row > div{min-width:0}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.btn{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:9px 14px;cursor:pointer;min-height:42px}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:700;font-size:16px;padding:12px 18px}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.meta{font-size:13px;color:var(--soft);margin-top:6px}
+.meta.warn{color:var(--med)}
+details.key{margin-top:14px;border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+details.key summary{cursor:pointer;font-weight:600}
+.keyrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.keyrow input{flex:1 1 200px;min-width:0}
+.status{margin-top:12px;padding:10px 12px;border-radius:10px;font-size:14px}
+.status.err{background:var(--err-bg);color:var(--err-ink)}
+.status.info{background:var(--chip)}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:sp .8s linear infinite;vertical-align:-2px;margin-right:6px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.empty{color:var(--soft);text-align:center;padding:40px 16px}
+.empty b{display:block;color:var(--ink);font-size:18px;margin-bottom:6px}
+.outbar{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:center;margin-bottom:10px}
+.outbar .btns{margin:0}
+.tagline{font-size:13px;color:var(--soft)}
+#report h2{font-size:24px;margin:4px 0 8px;line-height:1.25}
+#report h3{font-size:17px;margin:22px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--line)}
+#report .summary{font-size:16px;margin:0 0 6px}
+#report ul,#report ol{margin:6px 0;padding-left:22px}
+#report li{margin:6px 0}
+#report .src{font-size:12px;color:var(--soft);white-space:nowrap}
+.pill{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;border-radius:999px;padding:2px 8px;margin-right:6px;border:1px solid currentColor;vertical-align:1px}
+.pill.High{color:var(--hi)}.pill.Medium{color:var(--med)}.pill.Low{color:var(--lo)}
+.tbl{width:100%;border-collapse:collapse;font-size:14px}
+.tblwrap{overflow-x:auto}
+.tbl th,.tbl td{border:1px solid var(--line);padding:8px;text-align:left;vertical-align:top}
+.tbl th{background:var(--chip)}
+.sources{margin-top:22px;font-size:13px;color:var(--soft)}
+.sources summary{cursor:pointer}
+.sources ol{padding-left:22px}
+.badge{display:inline-block;font-size:12px;background:var(--chip);border-radius:6px;padding:2px 8px;margin-left:6px;color:var(--soft);font-weight:400}
+.raw p{margin:8px 0}
+footer{margin:28px 0 10px;text-align:center;color:var(--soft);font-size:14px}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:8px;font-size:14px;z-index:9}
+@media (max-width:480px){.row{grid-template-columns:1fr}}
+@media print{
+  body{background:#fff;color:#000;font-size:11pt}
+  header,.notice,#inputCard,.outbar .btns,footer,.toast,#status{display:none !important}
+  .layout{display:block;margin:0}
+  .card{border:0;padding:0}
+  #report h3{break-after:avoid;border-color:#999}
+  #report li{break-inside:avoid}
+  .sources summary{list-style:none;font-weight:700;color:#000}
+  a{color:#000}
+  .printhead{display:block !important;font-size:10pt;color:#444;margin-bottom:8pt}
+}
+.printhead{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Banking Market Intelligence Briefing</h1>
+    <p class="lead">Paste this week's banking news and notes. Get an executive briefing for your CEO, strategy, product or risk team in about a minute.</p>
+    <p class="notice" role="note"><b>Summarizes only what you paste.</b> This tool does not browse the web, open links, or check facts. Paste headlines and article text, not just URLs.</p>
+  </header>
+
+  <div class="layout">
+    <section class="card" id="inputCard" aria-labelledby="inTitle">
+      <h2 id="inTitle" class="sr" style="position:absolute;left:-9999px">Input</h2>
+      <label for="items">News items, article text or notes <span class="hint">Separate items with a blank line.</span></label>
+      <textarea id="items" placeholder="Paste one item per paragraph, for example:&#10;&#10;Bank X launches an AI assistant for small business clients...&#10;&#10;Regulator opens consultation on generative AI model risk..."></textarea>
+      <div class="meta" id="itemMeta" aria-live="polite">No items yet.</div>
+      <div class="btns">
+        <button class="btn" id="sampleBtn" type="button">Load sample items</button>
+        <button class="btn" id="exampleBtn" type="button">See example briefing</button>
+        <button class="btn" id="clearBtn" type="button">Clear</button>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="audience">Audience</label>
+          <select id="audience">
+            <option value="CEO">CEO</option>
+            <option value="Strategy">Strategy</option>
+            <option value="Product">Product</option>
+            <option value="Risk">Risk</option>
+          </select>
+        </div>
+        <div>
+          <label for="period">Period</label>
+          <select id="period">
+            <option>This week</option>
+            <option>Last 2 weeks</option>
+            <option>This month</option>
+            <option>This quarter</option>
+          </select>
+        </div>
+      </div>
+      <label for="context">Your institution or focus <span class="hint">Optional. Used to tailor implications.</span></label>
+      <input type="text" id="context" placeholder="e.g. mid-size retail bank, strong in SME lending">
+
+      <details class="key" id="keyBox">
+        <summary>Anthropic API key <span class="badge" id="keyBadge">not set</span></summary>
+        <p class="meta">Your key stays in this browser and is sent only to api.anthropic.com. Get one at <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com/settings/keys</a>.</p>
+        <label for="apiKey" class="sr" style="position:absolute;left:-9999px">API key</label>
+        <div class="keyrow">
+          <input type="password" id="apiKey" placeholder="sk-ant-..." autocomplete="off" spellcheck="false" aria-label="Anthropic API key">
+          <button class="btn" id="saveKey" type="button">Save</button>
+          <button class="btn" id="forgetKey" type="button">Forget</button>
+        </div>
+      </details>
+
+      <div class="btns">
+        <button class="btn primary" id="genBtn" type="button">Generate briefing</button>
+        <button class="btn" id="cancelBtn" type="button" style="display:none">Cancel</button>
+      </div>
+      <div id="status" role="status" aria-live="polite"></div>
+    </section>
+
+    <section class="card" aria-labelledby="outTitle">
+      <div class="outbar">
+        <span class="tagline" id="outTitle">Briefing</span>
+        <div class="btns">
+          <button class="btn" id="copyBtn" type="button" disabled>Copy Markdown</button>
+          <button class="btn" id="dlBtn" type="button" disabled>Download .md</button>
+          <button class="btn" id="printBtn" type="button" disabled>Print / PDF</button>
+        </div>
+      </div>
+      <div id="report">
+        <div class="empty"><b>Your briefing will appear here.</b>Paste items or click "Load sample items", then Generate. No key yet? Click "See example briefing".</div>
+      </div>
+    </section>
+  </div>
+
+  <footer>
+    Built by <a href="https://github.com/emresenturer">Emre Senturer</a> ·
+    <a href="https://github.com/emresenturer/ai-banking-market-intelligence">Source on GitHub</a> ·
+    Runs in your browser. Output is AI generated: verify before sharing.
+  </footer>
+</div>
+
+<script>
+(() => {
+'use strict';
+const KEY_NAME = 'banking_intel_anthropic_key';
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+const SAMPLE = `Northbridge Bank (fictional) launched an AI assistant for small business customers in its mobile app. It answers account and payments questions and hands lending requests to human bankers. The bank says 40% of business chat volume is now resolved without an agent.
+
+The national banking supervisor opened a 90-day consultation on model risk management for generative AI. Proposals include documented human review of customer-facing AI outputs, an inventory of AI use cases, and annual independent validation.
+
+Fintech PayLoop (fictional) raised a Series C round to expand embedded lending inside e-commerce checkout platforms, targeting merchants with fewer than 50 employees. It plans to enter two new markets next year.
+
+Alder Federal Credit Union (fictional) signed with a core banking vendor to move deposits onto a cloud core by 2027, citing the cost of maintaining its legacy platform.
+
+Industry report: 3 of the 5 largest domestic banks now offer real-time transfers to business clients. Losses from authorized push payment scams rose year over year, and the report calls for shared fraud data between banks.
+
+Harbor and Pine Bank (fictional) is closing 12% of its branches and reinvesting in video advisory for mortgages and wealth. Its customer satisfaction score dipped in the first quarter after the change.`;
+
+const EXAMPLE = {
+  headline: 'AI moves to the front line while supervisors tighten model risk rules',
+  summary: 'Banks are putting AI directly in front of customers and modernizing cores, while the supervisor signals stricter governance for generative AI. Fintechs are attacking SME lending at the point of sale, and real-time payments are raising fraud exposure.',
+  top_developments: [
+    {title:'Customer-facing AI reaches scale at Northbridge Bank', detail:'An in-app assistant now resolves 40% of business chat volume, with lending handed to humans.', impact:'High', sources:[1]},
+    {title:'Supervisor consults on generative AI model risk', detail:'90-day consultation proposes human review of customer-facing outputs, an AI use case inventory, and annual validation.', impact:'High', sources:[2]},
+    {title:'Embedded SME lending gets new funding', detail:'PayLoop raised a Series C to lend inside e-commerce checkouts for merchants under 50 employees.', impact:'Medium', sources:[3]},
+    {title:'Real-time payments spread, scam losses rise', detail:'3 of the 5 largest banks offer real-time business transfers; authorized push payment losses increased.', impact:'Medium', sources:[5]}
+  ],
+  regulatory: [
+    {title:'Generative AI model risk consultation (90 days)', detail:'Likely to require documented human oversight and validation for assistants like the one Northbridge launched.', sources:[2]},
+    {title:'Pressure for shared fraud data', detail:'The payments report calls for bank-to-bank fraud data sharing, a possible future requirement.', sources:[5]}
+  ],
+  fintech_competitors: [
+    {title:'PayLoop targets small merchants at checkout', detail:'Embedded credit at the point of sale bypasses the bank relationship for small business working capital.', sources:[3]},
+    {title:'Northbridge Bank sets a service benchmark', detail:'AI-first service for SMEs raises customer expectations for response speed.', sources:[1]},
+    {title:'Harbor and Pine trades branches for video advice', detail:'Early satisfaction dip shows the transition risk of channel shifts.', sources:[6]}
+  ],
+  trends: [
+    {trend:'AI assistants move from pilot to production', evidence:'Northbridge volume figures; supervisor response.', sources:[1,2]},
+    {trend:'Core modernization becomes a cost decision, not only a tech one', evidence:'Alder FCU cites legacy maintenance cost.', sources:[4]},
+    {trend:'Distribution shifts to embedded and remote channels', evidence:'PayLoop checkout lending; Harbor and Pine branch cuts.', sources:[3,6]}
+  ],
+  implications: [
+    {point:'Any customer-facing AI we run should be ready for documented human review and validation before the consultation closes.', sources:[2]},
+    {point:'SME lending share is exposed to checkout lenders unless we offer credit where merchants already transact.', sources:[3]},
+    {point:'Real-time payments growth without stronger scam controls increases reimbursement and reputation risk.', sources:[5]}
+  ],
+  actions: [
+    {action:'Commission a gap assessment of current AI use cases against the consultation proposals and respond within the window.', owner:'Chief Risk Officer', timeframe:'Next 30 days', rationale:'Shapes the final rule and avoids rework.'},
+    {action:'Evaluate an embedded lending partnership or API for e-commerce platforms serving small merchants.', owner:'Head of SME Banking', timeframe:'This quarter', rationale:'Defends share against checkout lenders.'},
+    {action:'Review authorized push payment scam controls and join an industry fraud data sharing pilot.', owner:'Head of Payments', timeframe:'Next 60 days', rationale:'Losses rising as real-time payments spread.'}
+  ],
+  watchlist: [
+    {item:'Final generative AI model risk guidance', why:'Sets the bar for customer-facing AI.', signal_to_watch:'Consultation outcome and effective dates.'},
+    {item:'PayLoop market entries', why:'Shows how fast embedded lending scales.', signal_to_watch:'Announcements of new platform partners.'},
+    {item:'Harbor and Pine satisfaction trend', why:'Tests whether video advice can replace branches.', signal_to_watch:'Next quarterly satisfaction score.'}
+  ],
+  coverage_gaps: ['No items on interest rates, deposits pricing or credit quality.', 'No figures on our own institution to benchmark against.']
+};
+
+const AUDIENCE = {
+  CEO: 'The reader is the CEO. Focus on competitive position, growth, reputation, capital and the 3 to 5 decisions that matter. Keep it short and plain.',
+  Strategy: 'The reader is the strategy team. Focus on market structure shifts, competitor and fintech moves, partnership patterns, and what they mean for positioning over 1 to 3 years.',
+  Product: 'The reader is the product team. Focus on customer needs, features and channels competitors are launching, partnership and platform opportunities, and roadmap implications.',
+  Risk: 'The reader is the risk and compliance team. Focus on regulatory changes, model risk, fraud, operational and conduct risk, and the controls or responses they require.'
+};
+
+const SYSTEM_PROMPT = `You are a senior market intelligence analyst for the banking industry.
+Analyze the banking industry news items provided by the user. Identify the most important developments and summarize them for an executive audience.
+
+Highlight:
+- Key industry developments
+- Strategic implications
+- Competitive movements
+- Emerging fintech trends
+- Regulatory developments
+
+Rules:
+- Use ONLY the numbered items the user provides. Do not add outside facts, figures, names or dates. You cannot browse the web; if an item is only a URL or a headline, say little about it.
+- Cite the item numbers you used in every entry's "sources" array.
+- Tailor emphasis and the recommended actions to the stated audience and institution context.
+- Be concise and specific. Plain business English. Do not use em dashes or en dashes; use commas, colons or periods.
+- If the items do not cover a section, return an empty array for it and say so in "coverage_gaps".
+- Owners in "actions" are roles (for example "Chief Risk Officer"), never named people.
+
+Return ONLY a JSON object, no prose and no code fences, with exactly this shape:
+{
+  "headline": "one line, max 14 words",
+  "summary": "2 to 3 sentences",
+  "top_developments": [{"title": "", "detail": "", "impact": "High|Medium|Low", "sources": [1]}],
+  "regulatory": [{"title": "", "detail": "", "sources": [1]}],
+  "fintech_competitors": [{"title": "", "detail": "", "sources": [1]}],
+  "trends": [{"trend": "", "evidence": "", "sources": [1]}],
+  "implications": [{"point": "", "sources": [1]}],
+  "actions": [{"action": "", "owner": "", "timeframe": "", "rationale": ""}],
+  "watchlist": [{"item": "", "why": "", "signal_to_watch": ""}],
+  "coverage_gaps": [""]
+}
+Limits: top_developments 3 to 6, other lists up to 5 each.`;
+
+/* ---------- items ---------- */
+const URL_ONLY = /^\s*(https?:\/\/\S+|www\.\S+)\s*$/i;
+function parseItems(text){
+  const t = text.replace(/\r/g, '').trim(); if (!t) return [];
+  let parts = t.split(/\n\s*\n/).map(s => s.trim()).filter(Boolean);
+  if (parts.length === 1 && parts[0].split('\n').length > 1) parts = parts[0].split('\n').map(s => s.replace(/^\s*([-*•]|\d+[.)])\s+/, '').trim()).filter(Boolean);
+  return parts.slice(0, 40);
+}
+function updateMeta(){
+  const items = parseItems($('items').value); const m = $('itemMeta');
+  const urls = items.filter(i => URL_ONLY.test(i)).length;
+  const chars = $('items').value.length;
+  if (!items.length){ m.textContent = 'No items yet.'; m.className = 'meta'; return items; }
+  let txt = `${items.length} item${items.length === 1 ? '' : 's'} detected · ${chars.toLocaleString()} characters`;
+  if (urls) txt += ` · ${urls} link-only item${urls === 1 ? '' : 's'}: the tool cannot open links, paste the headline or text too`;
+  if (chars > 60000) txt += ' · over 60,000 characters, trim to the most relevant items';
+  m.textContent = txt; m.className = 'meta' + (urls || chars > 60000 ? ' warn' : '');
+  return items;
+}
+$('items').addEventListener('input', updateMeta);
+$('sampleBtn').addEventListener('click', () => { $('items').value = SAMPLE; $('context').value = 'mid-size retail and SME bank'; updateMeta(); $('items').focus(); });
+$('clearBtn').addEventListener('click', () => { $('items').value = ''; updateMeta(); setStatus(''); });
+
+/* ---------- key ---------- */
+const getKey = () => { try { return localStorage.getItem(KEY_NAME) || ''; } catch(e){ return ''; } };
+function refreshKey(){ const k = getKey(); $('keyBadge').textContent = k ? 'saved in this browser' : 'not set'; if (k) $('apiKey').value = k; }
+$('saveKey').addEventListener('click', () => {
+  const v = $('apiKey').value.trim();
+  if (!v){ setStatus('Enter a key first.', 'err'); return; }
+  try { localStorage.setItem(KEY_NAME, v); } catch(e){}
+  refreshKey(); setStatus('Key saved in this browser.', 'info');
+});
+$('forgetKey').addEventListener('click', () => { try { localStorage.removeItem(KEY_NAME); } catch(e){} $('apiKey').value = ''; refreshKey(); setStatus('Key removed from this browser.', 'info'); });
+refreshKey();
+
+function setStatus(html, kind){ const s = $('status'); if (!html){ s.className = ''; s.innerHTML = ''; return; } s.className = 'status ' + (kind || 'info'); s.innerHTML = html; }
+
+/* ---------- API ---------- */
+let controller = null, current = null;
+async function generate(){
+  const items = updateMeta();
+  if (!items.length){ setStatus('Paste at least one news item, or click "Load sample items".', 'err'); $('items').focus(); return; }
+  const key = getKey() || $('apiKey').value.trim();
+  if (!key){ $('keyBox').open = true; setStatus('Add your Anthropic API key to generate a briefing, or click "See example briefing" to preview the output.', 'err'); $('apiKey').focus(); return; }
+  const audience = $('audience').value, period = $('period').value, ctx = $('context').value.trim();
+  const userText = `Audience: ${audience}. ${AUDIENCE[audience]}
+Period covered: ${period}. Today is ${new Date().toISOString().slice(0, 10)}.
+Institution context: ${ctx || 'not given'}.
+
+News items (${items.length}):
+${items.map((t, i) => `[${i + 1}] ${t}`).join('\n\n')}`;
+  controller = new AbortController();
+  $('genBtn').disabled = true; $('cancelBtn').style.display = '';
+  const t0 = Date.now();
+  setStatus(`<span class="spin" aria-hidden="true"></span>Analyzing ${items.length} items for the ${esc(audience)} audience. This usually takes 20 to 60 seconds.`, 'info');
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST', signal: controller.signal,
+      headers: {
+        'content-type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-beta': 'server-side-fallback-2026-07-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-opus-5-5',
+        max_tokens: 8000,
+        output_config: { effort: 'medium' },
+        fallbacks: 'default',
+        system: SYSTEM_PROMPT,
+        messages: [{ role: 'user', content: userText }]
+      })
+    });
+    if (!res.ok){
+      let msg = `Request failed (HTTP ${res.status}).`;
+      try { const err = await res.json(); if (err && err.error && err.error.message) msg = err.error.message; } catch(e){}
+      setStatus(`<b>API error:</b> ${esc(msg)}`, 'err'); return;
+    }
+    const data = await res.json();
+    if (data.stop_reason === 'refusal'){ setStatus('The model declined this request. Try rephrasing or removing sensitive content from the items.', 'err'); return; }
+    const text = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('');
+    const truncated = data.stop_reason === 'max_tokens';
+    const parsed = parseJSON(text);
+    current = {items, audience, period, ctx, parsed, raw:text, example:false};
+    render(current);
+    const secs = Math.round((Date.now() - t0) / 1000);
+    if (truncated) setStatus('The response hit the length limit, so the briefing may be incomplete. Try fewer items.', 'err');
+    else if (!parsed) setStatus('The model did not return the expected structure, so the raw text is shown.', 'err');
+    else setStatus(`Done in ${secs}s. Based only on the ${items.length} items you pasted.`, 'info');
+  } catch(e){
+    if (e.name === 'AbortError') setStatus('Cancelled.', 'info');
+    else setStatus(`<b>Network error:</b> ${esc(e.message || e)}. Check your connection and key.`, 'err');
+  } finally {
+    $('genBtn').disabled = false; $('cancelBtn').style.display = 'none'; controller = null;
+  }
+}
+$('genBtn').addEventListener('click', generate);
+$('cancelBtn').addEventListener('click', () => controller && controller.abort());
+$('exampleBtn').addEventListener('click', () => {
+  $('items').value = SAMPLE; $('context').value = 'mid-size retail and SME bank'; $('audience').value = 'CEO'; $('period').value = 'This week';
+  const items = updateMeta();
+  current = {items, audience:'CEO', period:'This week', ctx:'mid-size retail and SME bank', parsed:EXAMPLE, raw:'', example:true};
+  render(current); setStatus('Showing a pre-generated example built from the sample items. Add your key and click Generate for a live briefing.', 'info');
+});
+
+function parseJSON(text){
+  let t = String(text || '').trim().replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '').trim();
+  const a = t.indexOf('{'), b = t.lastIndexOf('}');
+  if (a === -1 || b <= a) return null;
+  try { const o = JSON.parse(t.slice(a, b + 1)); return (o && typeof o === 'object') ? o : null; } catch(e){ return null; }
+}
+const arr = v => Array.isArray(v) ? v : [];
+const srcs = s => { const a = arr(s).filter(n => Number.isFinite(+n)); return a.length ? a.map(n => `#${+n}`).join(', ') : ''; };
+
+/* ---------- render ---------- */
+function mini(md){ // escape first, then a tiny markdown subset
+  return esc(md).split(/\n{2,}/).map(block => {
+    const lines = block.split('\n');
+    if (lines.every(l => /^\s*([-*]|\d+\.)\s+/.test(l))) return '<ul>' + lines.map(l => `<li>${inline(l.replace(/^\s*([-*]|\d+\.)\s+/, ''))}</li>`).join('') + '</ul>';
+    const h = block.match(/^(#{1,4})\s+(.*)$/);
+    if (h && lines.length === 1) return `<h3>${inline(h[2])}</h3>`;
+    return `<p>${lines.map(inline).join('<br>')}</p>`;
+  }).join('');
+}
+const inline = s => s.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+
+function render(c){
+  const r = $('report'); const o = c.parsed;
+  const head = `<p class="printhead">Banking market intelligence briefing · ${esc(c.audience)} · ${esc(c.period)} · ${new Date().toISOString().slice(0, 10)} · Based only on ${c.items.length} pasted items</p>`;
+  if (!o){ r.innerHTML = head + `<div class="raw">${mini(c.raw || 'No text returned.')}</div>` + sourcesHTML(c.items); enableOut(); return; }
+  const sec = (title, list, fn, ordered) => {
+    const L = arr(list); if (!L.length) return '';
+    const tag = ordered ? 'ol' : 'ul';
+    return `<h3>${esc(title)}</h3><${tag}>${L.map(x => `<li>${fn(x || {})}</li>`).join('')}</${tag}>`;
+  };
+  const s = x => srcs(x.sources) ? ` <span class="src">[${esc(srcs(x.sources))}]</span>` : '';
+  const pill = v => ['High','Medium','Low'].includes(v) ? `<span class="pill ${v}">${v}</span>` : '';
+  let h = head;
+  h += `<span class="tagline">${c.example ? 'Example briefing · ' : ''}${esc(c.audience)} briefing · ${esc(c.period)}${c.ctx ? ' · ' + esc(c.ctx) : ''}</span>`;
+  h += `<h2>${esc(o.headline || 'Market intelligence briefing')}</h2>`;
+  if (o.summary) h += `<p class="summary">${esc(o.summary)}</p>`;
+  h += sec('Top developments', o.top_developments, x => `${pill(x.impact)}<b>${esc(x.title)}</b>. ${esc(x.detail)}${s(x)}`, true);
+  h += sec('Regulatory', o.regulatory, x => `<b>${esc(x.title)}</b>. ${esc(x.detail)}${s(x)}`);
+  h += sec('Fintech and competitors', o.fintech_competitors, x => `<b>${esc(x.title)}</b>. ${esc(x.detail)}${s(x)}`);
+  h += sec('Trends', o.trends, x => `<b>${esc(x.trend)}</b>. ${esc(x.evidence)}${s(x)}`);
+  h += sec(`Implications for ${c.audience === 'CEO' ? 'the CEO' : 'the ' + c.audience.toLowerCase() + ' team'}`, o.implications, x => `${esc(x.point)}${s(x)}`);
+  const acts = arr(o.actions);
+  if (acts.length) h += `<h3>Recommended actions</h3><div class="tblwrap"><table class="tbl"><thead><tr><th>Action</th><th>Owner</th><th>When</th><th>Why</th></tr></thead><tbody>${
+    acts.map(a => `<tr><td>${esc(a.action)}</td><td>${esc(a.owner)}</td><td>${esc(a.timeframe)}</td><td>${esc(a.rationale)}</td></tr>`).join('')}</tbody></table></div>`;
+  h += sec('Watchlist', o.watchlist, x => `<b>${esc(x.item)}</b>. ${esc(x.why)}${x.signal_to_watch ? ` <i>Watch for: ${esc(x.signal_to_watch)}</i>` : ''}`);
+  const gaps = arr(o.coverage_gaps).filter(Boolean);
+  if (gaps.length) h += `<h3>Not covered by the pasted items</h3><ul>${gaps.map(g => `<li>${esc(g)}</li>`).join('')}</ul>`;
+  h += sourcesHTML(c.items);
+  r.innerHTML = h; enableOut();
+  if (window.innerWidth < 1000) r.scrollIntoView({behavior:'smooth', block:'start'});
+}
+function sourcesHTML(items){
+  return `<details class="sources"><summary>Source items (${items.length})</summary><ol>${items.map(i => `<li>${esc(i)}</li>`).join('')}</ol></details>`;
+}
+function enableOut(){ ['copyBtn','dlBtn','printBtn'].forEach(id => $(id).disabled = false); }
+
+/* ---------- markdown export ---------- */
+function toMD(c){
+  const o = c.parsed; const L = [];
+  const s = x => srcs(x.sources) ? ` [${srcs(x.sources)}]` : '';
+  L.push(`# ${o ? (o.headline || 'Market intelligence briefing') : 'Market intelligence briefing'}`, '');
+  L.push(`*${c.audience} briefing · ${c.period}${c.ctx ? ' · ' + c.ctx : ''} · ${new Date().toISOString().slice(0, 10)}. Based only on ${c.items.length} pasted items; not web verified.*`, '');
+  if (!o){ L.push(c.raw, ''); }
+  else {
+    if (o.summary) L.push(o.summary, '');
+    const sec = (title, list, fn, num) => { const a = arr(list); if (!a.length) return; L.push(`## ${title}`, ''); a.forEach((x, i) => L.push(`${num ? (i + 1) + '.' : '-'} ${fn(x || {})}`)); L.push(''); };
+    sec('Top developments', o.top_developments, x => `${x.impact ? `**[${x.impact}]** ` : ''}**${x.title || ''}.** ${x.detail || ''}${s(x)}`, true);
+    sec('Regulatory', o.regulatory, x => `**${x.title || ''}.** ${x.detail || ''}${s(x)}`);
+    sec('Fintech and competitors', o.fintech_competitors, x => `**${x.title || ''}.** ${x.detail || ''}${s(x)}`);
+    sec('Trends', o.trends, x => `**${x.trend || ''}.** ${x.evidence || ''}${s(x)}`);
+    sec(`Implications for the ${c.audience}`, o.implications, x => `${x.point || ''}${s(x)}`);
+    const acts = arr(o.actions);
+    if (acts.length){ L.push('## Recommended actions', '', '| Action | Owner | When | Why |', '| --- | --- | --- | --- |');
+      const cell = v => String(v || '').replace(/\|/g, '\\|').replace(/\n/g, ' ');
+      acts.forEach(a => L.push(`| ${cell(a.action)} | ${cell(a.owner)} | ${cell(a.timeframe)} | ${cell(a.rationale)} |`)); L.push(''); }
+    sec('Watchlist', o.watchlist, x => `**${x.item || ''}.** ${x.why || ''}${x.signal_to_watch ? ` Watch for: ${x.signal_to_watch}` : ''}`);
+    sec('Not covered by the pasted items', arr(o.coverage_gaps).filter(Boolean).map(g => ({g})), x => x.g);
+  }
+  L.push('## Source items', '');
+  c.items.forEach((t, i) => L.push(`${i + 1}. ${t.replace(/\n+/g, ' ')}`));
+  return L.join('\n') + '\n';
+}
+$('copyBtn').addEventListener('click', async () => { if (!current) return; try { await navigator.clipboard.writeText(toMD(current)); toast('Markdown copied'); } catch(e){ toast('Copy failed. Use Download instead.'); } });
+$('dlBtn').addEventListener('click', () => {
+  if (!current) return;
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([toMD(current)], {type:'text/markdown'}));
+  a.download = `banking-briefing-${current.audience.toLowerCase()}-${new Date().toISOString().slice(0, 10)}.md`;
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+});
+$('printBtn').addEventListener('click', () => window.print());
+window.addEventListener('beforeprint', () => document.querySelectorAll('.sources').forEach(d => { d.open = true; }));
+function toast(t){ const d = document.createElement('div'); d.className = 'toast'; d.setAttribute('role', 'status'); d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 2000); }
+window.__briefing = { toMD: () => current && toMD(current), parseItems };
+})();
+</script>
+</body>
+</html>
